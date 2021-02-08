@@ -45,6 +45,8 @@ public:
   int ecdsaVerify(const byte message[], const byte signature[], const byte pubkey[]);
   int ecSign(int slot, const byte message[], byte signature[]);
 
+  int aes(byte mode, int slot, const byte input[], byte result[]);
+
   int beginSHA256();
   int updateSHA256(const byte data[]); // 64 bytes
   int endSHA256(byte result[]);

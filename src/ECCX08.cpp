@@ -243,6 +243,29 @@ int ECCX08Class::ecSign(int slot, const byte message[], byte signature[])
   return 1;
 }
 
+int ECCX08Class::aes(byte mode, int slot, const byte input[], byte result[])
+{
+  if (!wakeup()) {
+    return 0;
+  }
+
+  if (!sendCommand(0x51, mode, slot, input)) {
+    return 0;
+  }
+
+  delay(9);
+
+  if (!receiveResponse(result, 16)) {
+    return 0;
+  }
+
+  delay(1);
+  idle();
+
+
+  return 1;
+}
+
 int ECCX08Class::beginSHA256()
 {
   uint8_t status;
