@@ -24,9 +24,9 @@ void loop() {
   int success = ECCX08.aes(mode, slot, data, result);
 
   if (success == 1) {
-    Serial.println("AES encryption succeeded!")
+    Serial.println("AES encryption succeeded!");
   } else {
-    Serial.println("AES encryption failed!")
+    Serial.println("AES encryption failed!");
   }
 
   delay(1000);
