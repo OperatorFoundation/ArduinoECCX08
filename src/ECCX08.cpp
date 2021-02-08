@@ -243,6 +243,16 @@ int ECCX08Class::ecSign(int slot, const byte message[], byte signature[])
   return 1;
 }
 
+int ECCX08Class::aesEncryptECB(int slot, const byte input[], byte result[])
+{
+  return aes(0b00000000, slot, input, result);
+}
+
+int ECCX08Class::aesDecryptECB(int slot, const byte input[], byte result[])
+{
+  return aes(0b00100000, slot, input, result);
+}
+
 int ECCX08Class::aes(byte mode, int slot, const byte input[], byte result[])
 {
   if (!wakeup()) {

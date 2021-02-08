@@ -45,7 +45,8 @@ public:
   int ecdsaVerify(const byte message[], const byte signature[], const byte pubkey[]);
   int ecSign(int slot, const byte message[], byte signature[]);
 
-  int aes(byte mode, int slot, const byte input[], byte result[]);
+  int aesEncryptECB(int slot, const byte input[], byte result[]);
+  int aesDecryptECB(int slot, const byte input[], byte result[]);
 
   int beginSHA256();
   int updateSHA256(const byte data[]); // 64 bytes
@@ -69,6 +70,8 @@ private:
   int challenge(const byte message[]);
   int verify(const byte signature[], const byte pubkey[]);
   int sign(int slot, byte signature[]);
+
+  int aes(byte mode, int slot, const byte input[], byte result[]);
 
   int read(int zone, int address, byte buffer[], int length);
   int write(int zone, int address, const byte buffer[], int length);
