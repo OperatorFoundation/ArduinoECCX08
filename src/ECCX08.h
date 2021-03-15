@@ -48,6 +48,8 @@ public:
   int aesEncryptECB(int slot, const byte input[], byte result[]);
   int aesDecryptECB(int slot, const byte input[], byte result[]);
 
+  int aesMultiply(int slot, const byte input[], const byte h[], byte result[]);
+
   int beginSHA256();
   int updateSHA256(const byte data[]); // 64 bytes
   int endSHA256(byte result[]);

@@ -243,14 +243,28 @@ int ECCX08Class::ecSign(int slot, const byte message[], byte signature[])
   return 1;
 }
 
+
 int ECCX08Class::aesEncryptECB(int slot, const byte input[], byte result[])
 {
+  // mode: 000 aes-ECB-encrypt
   return aes(0b00000000, slot, input, result);
 }
 
 int ECCX08Class::aesDecryptECB(int slot, const byte input[], byte result[])
 {
+  // mode: 001 aes-ECB-decrypt
   return aes(0b00100000, slot, input, result);
+}
+
+// Datasheet Section 11.1
+int ECCX08Class::aesMultiply(int slot, const byte input[], const byte h[], byte result[])
+{
+  //contains H, then input
+  byte data[32];
+  memcpy(data, h, 16);
+  memcpy(data + 16, input, 16);
+  // mode: 011 calculate Galois Field Multiple(GFM) on the input data
+  return aes(0b01100000, slot, data, result);
 }
 
 int ECCX08Class::aes(byte mode, int slot, const byte input[], byte result[])
