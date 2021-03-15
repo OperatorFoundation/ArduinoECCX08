@@ -237,6 +237,14 @@ void AESTiny128::decryptBlock(uint8_t *output, const uint8_t *input)
     // Decryption is not supported by AESTiny128.
 }
 
+void AESTiny128::encryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input)
+{
+}
+
+void AESTiny128::decryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input)
+{
+}
+
 void AESTiny128::clear()
 {
     clean(schedule);

@@ -80,7 +80,7 @@ bool GCMCommon::setKey(const uint8_t *key, size_t len)
     return blockCipher->setKey(key, len);
 }
 
-bool GCMCommon::setIV(const uint8_t *iv, size_t len)
+bool GCMCommon::setIV(int slot, const uint8_t *iv, size_t len)
 {
     // Format the counter block from the IV.
     if (len == 12) {
@@ -93,7 +93,7 @@ bool GCMCommon::setIV(const uint8_t *iv, size_t len)
     } else {
         // IV's of other sizes are hashed to produce the counter block.
         memset(state.nonce, 0, 16);
-        blockCipher->encryptBlock(state.nonce, state.nonce);
+        blockCipher->encryptBlockWithSlot(slot, state.nonce, state.nonce);
         ghash.reset(state.nonce);
         ghash.update(iv, len);
         ghash.pad();
@@ -111,13 +111,13 @@ bool GCMCommon::setIV(const uint8_t *iv, size_t len)
 
     // Construct the hashing key by encrypting a zero block.
     memset(state.nonce, 0, 16);
-    blockCipher->encryptBlock(state.nonce, state.nonce);
+    blockCipher->encryptBlockWithSlot(slot, state.nonce, state.nonce);
     ghash.reset(state.nonce);
 
     // Replace the hash key in "nonce" with the encrypted counter.
     // This value will be XOR'ed with the final authentication hash
     // value in computeTag().
-    blockCipher->encryptBlock(state.nonce, state.counter);
+    blockCipher->encryptBlockWithSlot(slot, state.nonce, state.counter);
     return true;
 }
 
@@ -154,7 +154,7 @@ void GCMCommon::encrypt(int slot, uint8_t *output, const uint8_t *input, size_t 
         // Create a new keystream block if necessary.
         if (state.posn >= 16) {
             increment(state.counter);
-            blockCipher->encryptBlock(slot, state.stream, state.counter);
+            blockCipher->encryptBlockWithSlot(slot, state.stream, state.counter);
             state.posn = 0;
         }
 
@@ -193,7 +193,7 @@ void GCMCommon::decrypt(int slot, uint8_t *output, const uint8_t *input, size_t 
         // Create a new keystream block if necessary.
         if (state.posn >= 16) {
             increment(state.counter);
-            blockCipher->encryptBlock(slot, state.stream, state.counter);
+            blockCipher->encryptBlockWithSlot(slot, state.stream, state.counter);
             state.posn = 0;
         }
 

@@ -49,6 +49,9 @@ public:
     void encryptBlock(uint8_t *output, const uint8_t *input);
     void decryptBlock(uint8_t *output, const uint8_t *input);
 
+    void encryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input);
+    void decryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input);
+
     void clear();
 
 protected:
@@ -128,6 +131,9 @@ public:
     void encryptBlock(uint8_t *output, const uint8_t *input);
     void decryptBlock(uint8_t *output, const uint8_t *input);
 
+    void encryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input);
+    void decryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input);
+
     void clear();
 
 private:
@@ -163,6 +169,9 @@ public:
 
     void encryptBlock(uint8_t *output, const uint8_t *input);
     void decryptBlock(uint8_t *output, const uint8_t *input);
+
+    void encryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input);
+    void decryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input);
 
     void clear();
 

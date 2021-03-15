@@ -273,14 +273,14 @@ void AESCommon::encryptBlock(uint8_t *output, const uint8_t *input)
     ECCX08.aesEncryptECB(0, input, output);
 }
 
-void AESCommon::encryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input)
-{
-    ECCX08.aesEncryptECB(slot, input, output);
-}
-
 void AESCommon::decryptBlock(uint8_t *output, const uint8_t *input)
 {
     ECCX08.aesDecryptECB(0, input, output);
+}
+
+void AESCommon::encryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input)
+{
+    ECCX08.aesEncryptECB(slot, input, output);
 }
 
 void AESCommon::decryptBlockWithSlot(int slot, uint8_t *output, const uint8_t *input)

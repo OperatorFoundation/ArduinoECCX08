@@ -37,7 +37,7 @@ public:
     size_t tagSize() const;
 
     bool setKey(const uint8_t *key, size_t len);
-    bool setIV(const uint8_t *iv, size_t len);
+    bool setIV(int slot, const uint8_t *iv, size_t len);
 
     void encrypt(int slot, uint8_t *output, const uint8_t *input, size_t len);
     void decrypt(int slot, uint8_t *output, const uint8_t *input, size_t len);
