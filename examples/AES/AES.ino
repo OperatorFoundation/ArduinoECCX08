@@ -21,7 +21,7 @@ void loop() {
   byte data[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   byte result[16];
 
-  int success = ECCX08.aes(mode, slot, data, result);
+  int success = ECCX08.aesEncryptECB(mode, slot, data, result);
 
   if (success == 1) {
     Serial.println("AES encryption succeeded!");

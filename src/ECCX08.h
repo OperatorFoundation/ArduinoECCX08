@@ -41,14 +41,17 @@ public:
 
   int generatePrivateKey(int slot, byte publicKey[]);
   int generatePublicKey(int slot, byte publicKey[]);
-
+  int ecdhKeyGen(uint8_t mode, uint16_t keyID, byte publicKey[]);
+  //byte[] ecdhKeyGen(int slot, byte mode, byte keyID[], byte dataX[], byte dataY[]);
+    
   int ecdsaVerify(const byte message[], const byte signature[], const byte pubkey[]);
   int ecSign(int slot, const byte message[], byte signature[]);
 
-  int aesEncryptECB(int slot, const byte input[], byte result[]);
-  int aesDecryptECB(int slot, const byte input[], byte result[]);
-
-  int aesMultiply(int slot, const byte input[], const byte h[], byte result[]);
+    //input is plaintext.  this function writes ciphertext to result
+    int aes(byte mode, uint16_t slot, const byte input[], byte result[]);
+  int aesEncryptECB(uint16_t slot, const byte input[], byte result[]);
+  int aesDecryptECB(uint16_t slot, const byte input[], byte result[]);
+  int aesMultiply(uint16_t slot, const byte input[], const byte h[], byte result[]);
 
   int beginSHA256();
   int updateSHA256(const byte data[]); // 64 bytes
@@ -73,7 +76,7 @@ private:
   int verify(const byte signature[], const byte pubkey[]);
   int sign(int slot, byte signature[]);
 
-  int aes(byte mode, int slot, const byte input[], byte result[]);
+
 
   int read(int zone, int address, byte buffer[], int length);
   int write(int zone, int address, const byte buffer[], int length);
@@ -83,6 +86,7 @@ private:
 
   int sendCommand(uint8_t opcode, uint8_t param1, uint16_t param2, const byte data[] = NULL, size_t dataLength = 0);
   int receiveResponse(void* response, size_t length);
+  int receiveResponseWithErrorCode(void* response, size_t length);
   uint16_t crc16(const byte data[], size_t length);
 
 private:

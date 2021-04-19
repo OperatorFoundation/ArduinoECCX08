@@ -21,6 +21,8 @@
 
 #include "ECCX08.h"
 
+#include <cstring>
+
 const uint32_t ECCX08Class::_wakeupFrequency = 100000u;  // 100 kHz
 #ifdef __AVR__
 const uint32_t ECCX08Class::_normalFrequency = 400000u;  // 400 kHz
@@ -211,6 +213,62 @@ int ECCX08Class::generatePublicKey(int slot, byte publicKey[])
   return 1;
 }
 
+int ECCX08Class::ecdhKeyGen(uint8_t mode, uint16_t keyID, byte publicKey[])
+{
+    byte output[1];
+
+    if (!wakeup()) {
+        return 1;
+    }
+    
+    if (!sendCommand(0x43, mode, keyID, publicKey)) {
+        return 2;
+    }
+    
+    delay(1150);
+
+    int responseResult = receiveResponse(output, 1);
+
+    if (responseResult != 1) {
+
+        delay(1);
+        idle();
+
+        return responseResult + 100;
+    }
+
+    delay(1);
+
+    idle();
+
+
+    return 0;
+}
+
+//byte[] ECCX08Class::ecdhEncryptedKeyGen(int slot, byte mode, byte keyID[], byte dataX[], byte dataY[])
+//{
+//    if (!wakeup()) {
+//        return 0
+//    }
+//
+//    if (!sendCommand(0x43, 0x00, slot)) {
+//        return 0
+//    }
+//
+//    delay(115);
+//
+//    if (!receiveResponse(keyID, 64)) {
+//      return 0;
+//    }
+//
+//    delay(1);
+//
+//    idle();
+//
+//    return 1;
+//}
+
+
 int ECCX08Class::ecdsaVerify(const byte message[], const byte signature[], const byte pubkey[])
 {
   if (!challenge(message)) {
@@ -244,20 +302,20 @@ int ECCX08Class::ecSign(int slot, const byte message[], byte signature[])
 }
 
 
-int ECCX08Class::aesEncryptECB(int slot, const byte input[], byte result[])
+int ECCX08Class::aesEncryptECB(uint16_t slot, const byte input[], byte result[])
 {
   // mode: 000 aes-ECB-encrypt
   return aes(0b00000000, slot, input, result);
 }
 
-int ECCX08Class::aesDecryptECB(int slot, const byte input[], byte result[])
+int ECCX08Class::aesDecryptECB(uint16_t slot, const byte input[], byte result[])
 {
   // mode: 001 aes-ECB-decrypt
   return aes(0b00100000, slot, input, result);
 }
 
 // Datasheet Section 11.1
-int ECCX08Class::aesMultiply(int slot, const byte input[], const byte h[], byte result[])
+int ECCX08Class::aesMultiply(uint16_t slot, const byte input[], const byte h[], byte result[])
 {
   //contains H, then input
   byte data[32];
@@ -267,20 +325,21 @@ int ECCX08Class::aesMultiply(int slot, const byte input[], const byte h[], byte 
   return aes(0b01100000, slot, data, result);
 }
 
-int ECCX08Class::aes(byte mode, int slot, const byte input[], byte result[])
+int ECCX08Class::aes(byte mode, uint16_t slot, const byte input[], byte result[])
 {
   if (!wakeup()) {
-    return 0;
+    return 2;
   }
 
   if (!sendCommand(0x51, mode, slot, input)) {
-    return 0;
+    return 3;
   }
 
-  delay(9);
+  delay(900);
 
-  if (!receiveResponse(result, 16)) {
-    return 0;
+  int response = receiveResponseWithErrorCode(result, 16);
+  if (response != 1) {
+    return response + 100;
   }
 
   delay(1);
@@ -790,6 +849,36 @@ int ECCX08Class::receiveResponse(void* response, size_t length)
   memcpy(response, &responseBuffer[1], length);
 
   return 1;
+}
+
+int ECCX08Class::receiveResponseWithErrorCode(void* response, size_t length)
+{
+    int retries = 20;
+    size_t responseSize = length + 3; // 1 for length header, 2 for CRC
+    byte responseBuffer[responseSize];
+
+    while (_wire->requestFrom((uint8_t)_address, (size_t)responseSize, (bool)true) != responseSize && retries--);
+
+    responseBuffer[0] = _wire->read();
+
+    // make sure length matches
+    if (responseBuffer[0] != responseSize) {
+        return (int)_wire->read() + 50;
+    }
+
+    for (size_t i = 1; _wire->available(); i++) {
+        responseBuffer[i] = _wire->read();
+    }
+
+    // verify CRC
+    uint16_t responseCrc = responseBuffer[length + 1] | (responseBuffer[length + 2] << 8);
+    if (responseCrc != crc16(responseBuffer, responseSize - 2)) {
+        return 300;
+    }
+
+    memcpy(response, &responseBuffer[1], length);
+
+    return 1;
 }
 
 uint16_t ECCX08Class::crc16(const byte data[], size_t length)
