@@ -331,7 +331,7 @@ int ECCX08Class::aes(byte mode, uint16_t slot, const byte input[], byte result[]
     return 2;
   }
 
-  if (!sendCommand(0x51, mode, slot, input)) {
+    if (!sendCommand(0x51, mode, slot, input, sizeof(input))) {
     return 3;
   }
 
@@ -863,7 +863,7 @@ int ECCX08Class::receiveResponseWithErrorCode(void* response, size_t length)
 
     // make sure length matches
     if (responseBuffer[0] != responseSize) {
-        return (int)_wire->read() + 50;
+        return (int)_wire->read() + 60;
     }
 
     for (size_t i = 1; _wire->available(); i++) {
